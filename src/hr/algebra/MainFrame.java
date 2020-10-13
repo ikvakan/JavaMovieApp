@@ -3,18 +3,28 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+package hr.algebra;
+
+import javax.swing.JOptionPane;
 
 /**
  *
  * @author IgorKvakan
  */
-public class AdminMainForm extends javax.swing.JFrame {
+public class MainFrame extends javax.swing.JFrame {
 
-    /**
-     * Creates new form AdminMainForm
-     */
-    public AdminMainForm() {
+    private  LoginDialog loginDialog;
+    
+    private static final String UPLOAD_PANEL="Upload movies";
+    private static final String EDIT_PANEL="Edit movies";
+    
+    public MainFrame() {
         initComponents();
+        intiLoginDialog();
+        //initLoginPanel();
+        initAdminPanels();
+
+
     }
 
     /**
@@ -26,17 +36,22 @@ public class AdminMainForm extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        tpContent = new javax.swing.JTabbedPane();
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setPreferredSize(new java.awt.Dimension(800, 600));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(tpContent, javax.swing.GroupLayout.DEFAULT_SIZE, 618, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addComponent(tpContent, javax.swing.GroupLayout.DEFAULT_SIZE, 421, Short.MAX_VALUE)
         );
 
         pack();
@@ -59,24 +74,59 @@ public class AdminMainForm extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(AdminMainForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(AdminMainForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(AdminMainForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(AdminMainForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new AdminMainForm().setVisible(true);
+                MainFrame mainFrame=new MainFrame();
+                mainFrame.setVisible(true);
+                mainFrame.setLocationRelativeTo(null);
+                
+
             }
         });
     }
 
+     private  void intiLoginDialog() {
+         
+        loginDialog= new LoginDialog(this,true);
+        loginDialog.setLocationRelativeTo(this);
+        loginDialog.setVisible(true);
+        
+         if (!loginDialog.isVisible()) {
+             
+             System.exit(0);
+         }
+         
+        
+    }
+     
+     
+     
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTabbedPane tpContent;
     // End of variables declaration//GEN-END:variables
+
+    private void initAdminPanels() {
+        
+        tpContent.add(UPLOAD_PANEL,new UploadPanel());
+        tpContent.add(EDIT_PANEL,new EditPanel());
+    
+    }
+
+   
+
+    
 }
+
+
