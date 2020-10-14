@@ -6,8 +6,9 @@
 package hr.algebra;
 
 
-import hr.algebra.model.RegisteredUser;
+
 import hr.algebra.model.User;
+import hr.algebra.repo.dal.RepositoryFactory;
 import hr.algebra.utils.MessageUtils;
 import java.util.Arrays;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
+import hr.algebra.repo.dal.UserRepository;
 
 
 
@@ -31,12 +33,15 @@ public  class LoginDialog extends javax.swing.JDialog {
    
    private List<JLabel> errorLabels;
    private List<JTextField> validationFields;
+   
+   private UserRepository repository;
+   
     
-    public LoginDialog(java.awt.Frame parent, boolean modal) {
+    public LoginDialog(java.awt.Frame parent, boolean modal)   {
         super(parent, modal);
         this.parent=(MainFrame) parent;
         initComponents();
-        initValidationFields();
+        init();
     }
 
     /**
@@ -137,6 +142,11 @@ public  class LoginDialog extends javax.swing.JDialog {
             
             try {
                 
+                    int id=repository.createUser(user);
+                    
+             
+                
+                //repository.createUser(user);
                 
                 
             } catch (Exception e) {
@@ -226,6 +236,24 @@ public  class LoginDialog extends javax.swing.JDialog {
         }
         return false;
     }
+
+    private void intiRepository() throws Exception {
+        repository=RepositoryFactory.getSqlUserRepository();
+    }
+
+    private void init()  {
+        try {
+            initValidationFields();
+            intiRepository();
+        } catch (Exception ex) {
+            Logger.getLogger(LoginDialog.class.getName()).log(Level.SEVERE, null, ex);
+            
+        }
+    }
+
+   
+
+    
 
    
 }
