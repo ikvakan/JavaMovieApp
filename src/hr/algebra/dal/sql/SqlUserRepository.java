@@ -11,7 +11,9 @@ import java.util.Optional;
 import hr.algebra.repo.dal.UserRepository;
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.Types;
+import java.util.ArrayList;
 import javax.sql.DataSource;
 
 
@@ -48,12 +50,44 @@ public class SqlUserRepository implements UserRepository{
 
     @Override
     public Optional<User> selectUser(int id) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        DataSource dataSource=DataSourceSingleton.getInstance();
+        try (Connection con = dataSource.getConnection();
+                CallableStatement stmt=con.prepareCall(SELECT_USER)){
+            
+            stmt.setInt(1, id);
+            try(ResultSet rs=stmt.executeQuery()){
+                
+                if (rs.next()) {
+                    return Optional.of(new User(
+                            rs.getInt(ID_USER),
+                            rs.getString(USER_NAME),
+                            rs.getString(PASSWORD)));
+                }
+            }
+        }
+        
+        return Optional.empty();
     }
 
     @Override
     public List<User> selectUsers() throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        List<User> users = new ArrayList<>();
+        DataSource dataSource = DataSourceSingleton.getInstance();
+        try (Connection con = dataSource.getConnection();
+                CallableStatement stmt = con.prepareCall(SELECT_USERS);
+                ResultSet rs = stmt.executeQuery()) {
+          
+            while (rs.next()) {
+                users.add(new User(
+                                rs.getInt(ID_USER),
+                                rs.getString(USER_NAME),
+                                rs.getString(PASSWORD))
+                );
+            
+            };
+        
+        } 
+        return users;
     }
     
 }

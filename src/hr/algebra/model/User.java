@@ -11,14 +11,28 @@ package hr.algebra.model;
  */
 public class User {
     
-    private final String userName;
-    private final String password;
+    private  int idUser;
+    private  String userName;
+    private  String password;
 
+   
+
+    public User(int idUser, String userName, String password) {
+        this(userName,password);
+        this.idUser = idUser;
+    }
+    
     public User(String userName, String password) {
         this.userName = userName;
         this.password = password;
     }
+ 
+    public int getIdUser() {
+        return idUser;
+    }
 
+    
+    
     public String getUserName() {
         return userName;
     }

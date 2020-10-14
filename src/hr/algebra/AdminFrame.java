@@ -5,28 +5,30 @@
  */
 package hr.algebra;
 
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 /**
  *
  * @author IgorKvakan
  */
-public class MainFrame extends javax.swing.JFrame {
 
-    private  LoginDialog loginDialog;
+
+public class AdminFrame extends javax.swing.JFrame {
+
     
     private static final String UPLOAD_PANEL="Upload movies";
     private static final String EDIT_PANEL="Edit movies";
     
-    public MainFrame() {
+    public AdminFrame() {
         initComponents();
-        intiLoginDialog();
-        //initLoginPanel();
         initAdminPanels();
-
-
+        
     }
 
+    
+    
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -74,20 +76,21 @@ public class MainFrame extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(AdminFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(AdminFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(AdminFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(AdminFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                MainFrame mainFrame=new MainFrame();
+                AdminFrame mainFrame=new AdminFrame();
                 mainFrame.setVisible(true);
                 mainFrame.setLocationRelativeTo(null);
                 
@@ -96,23 +99,7 @@ public class MainFrame extends javax.swing.JFrame {
         });
     }
 
-     private  void intiLoginDialog() {
-         
-        loginDialog= new LoginDialog(this,true);
-        loginDialog.setLocationRelativeTo(this);
-        loginDialog.setVisible(true);
-        
-         if (!loginDialog.isVisible()) {
-             
-             System.exit(0);
-         }
-         
-        
-    }
      
-     
-     
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTabbedPane tpContent;
     // End of variables declaration//GEN-END:variables
@@ -124,8 +111,7 @@ public class MainFrame extends javax.swing.JFrame {
     
     }
 
-   
-
+ 
     
 }
 
