@@ -5,6 +5,7 @@
  */
 package hr.algebra.repo.dal;
 
+import hr.algebra.dal.sql.SqlMovieRepository;
 import hr.algebra.dal.sql.SqlUserRepository;
 
 /**
@@ -18,6 +19,10 @@ public  class RepositoryFactory {
     
     public static UserRepository getSqlUserRepository() throws Exception{
         return new SqlUserRepository();
+    }
+    
+    public static MovieRepository getMovieRepository(){
+        return new SqlMovieRepository();
     }
     
 }

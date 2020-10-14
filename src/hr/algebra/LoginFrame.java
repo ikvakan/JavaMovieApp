@@ -133,16 +133,13 @@ public class LoginFrame extends javax.swing.JFrame {
         
         if (formValid()) {
             
-           
                 User user = new User(
                         tfUserName.getText().trim(),
                         new String(tfPassword.getPassword()));
                 
                 if (user.isAdmin(user.getUserName(), user.getPassword())) {
-                    adminFrame = new AdminFrame();
-                    adminFrame.setVisible(true);
-                    adminFrame.setLocationRelativeTo(this);
                     MessageUtils.showInformationMessage("Login", "Loged in as admin");
+                    openAdminFrame();
                     dispose();
                 }                
                 
@@ -150,6 +147,7 @@ public class LoginFrame extends javax.swing.JFrame {
                     if (isNewUser(user)) {
                         repository.createUser(user);
                         MessageUtils.showInformationMessage("Login", "User added");
+                        //openUserFrame();
                         dispose();
                     }
                     else{
@@ -167,6 +165,12 @@ public class LoginFrame extends javax.swing.JFrame {
         }
         
     }//GEN-LAST:event_btnLoginActionPerformed
+
+    private void openAdminFrame() {
+        adminFrame = new AdminFrame();
+        adminFrame.setVisible(true);
+        adminFrame.setLocationRelativeTo(this);
+    }
     
 
     /**
