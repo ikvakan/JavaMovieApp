@@ -232,8 +232,7 @@ public class LoginFrame extends javax.swing.JFrame {
     }
 
     private void initRepository() throws Exception {
-        
-            repository=RepositoryFactory.getSqlUserRepository();
+       repository=RepositoryFactory.getSqlUserRepository();
     }
 
     private void intiFields() {
@@ -271,7 +270,6 @@ public class LoginFrame extends javax.swing.JFrame {
           
         } catch (Exception ex) {
             Logger.getLogger(LoginFrame.class.getName()).log(Level.SEVERE, null, ex);
-            result=true;
         }
         
          return result;

@@ -8,6 +8,8 @@ package hr.algebra.parser.rss;
 import hr.algebra.factory.ParseFactory;
 import hr.algebra.factory.UrlConnectionFactory;
 import hr.algebra.model.Movie;
+import hr.algebra.utils.FileUtils;
+import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.time.LocalDateTime;
@@ -16,31 +18,40 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
-import javax.xml.namespace.QName;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
+
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.Attribute;
+
 import javax.xml.stream.events.Characters;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 /**
  *
  * @author IgorKvakan
  */
 public class MovieParser {
-    private static final String RSS_URL = "https://www.blitz-cinestar.hr/rss.aspx";
+
+    private static final String RSS_URL = "https://www.kaptolcinema.hr/rss.aspx?id=2564";
+
     private static final int TIMEOUT = 10000;
     private static final String REQUEST_METHOD = "GET";
     private static final String ATTRIBUTE_URL = "url";
     private static final String EXT = ".jpg";
     private static final String DIR = "assets";
-    
+
+    private static final String ITEM_ELEMENT = "item";
+
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
     private static final Random RANDOM = new Random();
-    
-   public static List<Movie> parse() throws IOException, XMLStreamException {
+
+    public static List<Movie> parse() throws IOException, XMLStreamException {
         List<Movie> movies = new ArrayList<>();
         HttpURLConnection con = UrlConnectionFactory.getHttpUrlConnection(RSS_URL, TIMEOUT, REQUEST_METHOD);
         XMLEventReader reader = ParseFactory.createStaxParser(con.getInputStream());
@@ -48,28 +59,115 @@ public class MovieParser {
         Optional<TagType> tagType = Optional.empty();
         Movie movie = null;
         StartElement startElement = null;
-   
-        while (reader.hasNext()) {           
-           
-       }
-        
-   
+
+        while (reader.hasNext()) {
+            XMLEvent event = reader.nextEvent();
+            switch (event.getEventType()) {
+                case XMLStreamConstants.START_ELEMENT:
+                    startElement = event.asStartElement();
+                    String qName = startElement.getName().getLocalPart();
+                    tagType = TagType.from(qName);
+
+                    if (qName == ITEM_ELEMENT) {
+                        movie = new Movie();
+                        movies.add(movie);
+                    }
+
+                    break;
+                case XMLStreamConstants.CHARACTERS:
+                case XMLStreamConstants.CDATA:
+                    if (tagType.isPresent()) {
+                        Characters characters = event.asCharacters();
+
+                        String data = characters.getData().trim();
+
+                        switch (tagType.get()) {
+
+                            case TITLE:
+                                if (movie != null && !data.isEmpty()) {
+                                    movie.setTitle(data);
+                                }
+                                break;
+                            case DESCRIPTION:
+                                if (movie != null && !data.isEmpty()) {
+                                    Document doc = Jsoup.parse(data);
+                                    movie.setDescription(doc.text());
+                                }
+                                break;
+                            case DIRECTOR:
+                                if (movie != null && !data.isEmpty()) {
+                                    movie.setDirector(data);
+                                }
+                                break;
+                            case ACTORS:
+                                if (movie != null && !data.isEmpty()) {
+                                    movie.setActors(data);
+                                }
+                                break;
+                            case DURATION:
+                                if (movie != null && !data.isEmpty()) {
+                                    movie.setDuration(data);
+                                }
+                                break;
+                            case GENRE:
+                                if (movie != null && !data.isEmpty()) {
+                                    movie.setGenre(data);
+                                }
+                                break;
+                            case PUB_DATE:
+                                if (movie != null && !data.isEmpty()) {
+                                    //LocalDateTime pubDateTime=LocalDateTime.parse(data,DATE_FORMATTER);
+                                    movie.setPubDate(data);
+                                }
+                                break;
+                            case PICTUR_PATH:
+                                if (movie != null && !data.isEmpty()) {
+                                    handlePicture(movie, data);
+                                }
+                                break;
+
+                        }
+                    }
+                    break;
+            }
+        }
+
         return movies;
-   
-   }
-    
-    
+
+    }
+
+    private static void handlePicture(Movie movie, String data) throws IOException {
+        String ext = data.substring(data.lastIndexOf("."));
+        if (ext.length() > 4) {
+            ext = EXT;
+        }
+        String pictureName = Math.abs(RANDOM.nextInt()) + ext;
+        String localPicturePath = DIR + File.separator + pictureName;
+        
+
+        if (!isDuplicatePicture()) {
+            FileUtils.copyFromUrl(data, localPicturePath);
+
+        }
+
+        movie.setPicturePath(localPicturePath);
+    }
+
+    private static boolean isDuplicatePicture() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
     private enum TagType {
 
-        ITEM("item"), 
-        TITLE("title"), 
-        DURATION("trajanje"),
-        DESCRIPTION("description"), 
-        ENCLOSURE("enclosure"),
-        GENRE("zanr"),
+        ITEM("item"),
+        TITLE("title"),
+        PUB_DATE("datumprikazivanja"),
+        DESCRIPTION("description"),
         DIRECTOR("redatelj"),
         ACTORS("glumci"),
-        PUB_DATE("pubDate");
+        DURATION("trajanje"),
+        GENRE("zanr"),
+        PICTUR_PATH("plakat");
 
         private final String name;
 

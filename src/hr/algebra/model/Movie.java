@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @author IgorKvakan
  */
-public class Movie {
+public class Movie implements Comparable<Movie>{
     
     public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
     
@@ -21,38 +21,37 @@ public class Movie {
     private int id;
     private String title;
     private String description;
-    private List<Director> directors;
-    private List<Actor> actors;
-    private int duration;
-    private LocalDateTime pubDate;
-    private String genre;
+    private String directors;
+    private String actors;
+    private String duration;
+    private String genre;    
+    private String pubDate;
     private String picturePath;
 
-    public Movie(int id, String title, String description, List<Director> directors, List<Actor> actors, int duration, LocalDateTime pubDate, String genre, String picturePath) {
-        this( title,  description,  directors, actors,  duration,  pubDate,  genre,  picturePath);
+    public Movie(int id, String title, String description, String directors, String actors, String duration, String genre, String pubDate, String picturePath) {
         this.id = id;
-        
-    }
-
-    public Movie(String title, String description, List<Director> directors, List<Actor> actors, int duration, LocalDateTime pubDate, String genre, String picturePath) {
         this.title = title;
         this.description = description;
         this.directors = directors;
         this.actors = actors;
         this.duration = duration;
-        this.pubDate = pubDate;
         this.genre = genre;
+        this.pubDate = pubDate;
         this.picturePath = picturePath;
     }
 
-    public Movie(int id, String title, String description, int duration, LocalDateTime pubDate, String genre, String picturePath) {
-        this.id = id;
+    public Movie(String title, String description, String directors, String actors, String duration, String genre, String pubDate, String picturePath) {
         this.title = title;
         this.description = description;
+        this.directors = directors;
+        this.actors = actors;
         this.duration = duration;
-        this.pubDate = pubDate;
         this.genre = genre;
+        this.pubDate = pubDate;
         this.picturePath = picturePath;
+    }
+
+    public Movie() {
     }
 
     
@@ -81,35 +80,35 @@ public class Movie {
         this.description = description;
     }
 
-    public List<Director>  getDirector() {
+    public String  getDirector() {
         return directors;
     }
 
-    public void setDirector(List<Director> directors) {
+    public void setDirector(String directors) {
         this.directors = directors;
     }
 
-    public List<Actor> getActors() {
+    public String getActors() {
         return actors;
     }
 
-    public void setActors(List<Actor> actors) {
+    public void setActors(String actors) {
         this.actors = actors;
     }
 
-    public int getDuration() {
+    public String getDuration() {
         return duration;
     }
 
-    public void setDuration(int duration) {
+    public void setDuration(String duration) {
         this.duration = duration;
     }
 
-    public LocalDateTime getPubDate() {
+    public String getPubDate() {
         return pubDate;
     }
 
-    public void setPubDate(LocalDateTime pubDate) {
+    public void setPubDate(String pubDate) {
         this.pubDate = pubDate;
     }
 
@@ -132,6 +131,11 @@ public class Movie {
     @Override
     public String toString() {
         return  title ;
+    }
+
+    @Override
+    public int compareTo(Movie m) {
+       return title.compareTo(m.title);
     }
     
     

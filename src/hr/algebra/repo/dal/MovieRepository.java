@@ -8,6 +8,7 @@ package hr.algebra.repo.dal;
 import hr.algebra.model.Movie;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  *
@@ -16,9 +17,9 @@ import java.util.Optional;
 public interface MovieRepository {
     
     int createMovie(Movie article) throws Exception;
-    void createMovies(List<Movie> articles) throws Exception;    
+    void createMovies(Set<Movie> articles) throws Exception;    
     void updateMovie(int id, Movie data) throws Exception;
     void deleteMovie(int id) throws Exception;
     Optional<Movie> selectMovie(int id) throws Exception;
-    List<Movie> selectMovie() throws Exception;
+    List<Movie> selectMovies() throws Exception;
 }
