@@ -38,7 +38,7 @@ import org.jsoup.nodes.Document;
  */
 public class MovieParser {
 
-    private static final String RSS_URL = "https://www.kaptolcinema.hr/rss.aspx?id=2564";
+    private static final String RSS_URL = "https://www.cinestarcinemas.rs/rss.aspx?id=415";
 
     private static final int TIMEOUT = 10000;
     private static final String REQUEST_METHOD = "GET";
@@ -50,6 +50,8 @@ public class MovieParser {
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
     private static final Random RANDOM = new Random();
+    
+    private static Set<String> pictures= new TreeSet<>((s1,s2)->s1.compareTo(s2));
 
     public static List<Movie> parse() throws IOException, XMLStreamException {
         List<Movie> movies = new ArrayList<>();
@@ -122,6 +124,8 @@ public class MovieParser {
                                 break;
                             case PICTUR_PATH:
                                 if (movie != null && !data.isEmpty()) {
+                                    pictures.add(data);
+                                    
                                     handlePicture(movie, data);
                                 }
                                 break;
@@ -131,7 +135,8 @@ public class MovieParser {
                     break;
             }
         }
-
+        
+        createPictureAssets();
         return movies;
 
     }
@@ -145,16 +150,35 @@ public class MovieParser {
         String localPicturePath = DIR + File.separator + pictureName;
         
 
-        if (!isDuplicatePicture()) {
-            FileUtils.copyFromUrl(data, localPicturePath);
+        
+        //FileUtils.copyFromUrl(data, localPicturePath);
 
-        }
+        
 
         movie.setPicturePath(localPicturePath);
     }
 
-    private static boolean isDuplicatePicture() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+
+
+    private static void createPictureAssets() throws IOException {
+        if (pictures.size()== 0) {
+            return;
+        }
+        for (String picture : pictures) {
+            FileUtils.copyFromUrl(picture, getDestination(picture));
+        }
+        
+    }
+
+    private static String getDestination(String picture) {
+        String ext = picture.substring(picture.lastIndexOf("."));
+        if (ext.length() > 4) {
+            ext = EXT;
+        }
+        String pictureName = Math.abs(RANDOM.nextInt()) + ext;
+        String localPicturePath = DIR + File.separator + pictureName;
+        
+        return localPicturePath;
     }
 
     private enum TagType {
