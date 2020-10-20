@@ -5,7 +5,6 @@
  */
 package hr.algebra;
 
-
 import hr.algebra.model.Movie;
 
 import hr.algebra.model.MoviesTableModel;
@@ -20,11 +19,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
-import javax.swing.table.DefaultTableModel;
 import javax.xml.stream.XMLStreamException;
 
 /**
@@ -33,20 +28,13 @@ import javax.xml.stream.XMLStreamException;
  */
 public class UploadPanel extends javax.swing.JPanel {
 
-   
     private MovieRepository repository;
-    //set ili unique collection
-    
+
     private MoviesTableModel moviesTableModel;
-    
-    
-    
-    private DefaultComboBoxModel<Movie> defaultComboBoxModel;
-    
+
     public UploadPanel() {
         initComponents();
         init();
-        
 
     }
 
@@ -60,14 +48,8 @@ public class UploadPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         btnUpload = new javax.swing.JButton();
-        jPanel1 = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
-        cbMovies = new javax.swing.JComboBox<>();
-        btnSelect = new javax.swing.JButton();
-        btnEdit = new javax.swing.JButton();
-        btnClearSelected = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
-        tblSelectedMovies = new javax.swing.JTable();
+        tblMovies = new javax.swing.JTable();
 
         btnUpload.setBackground(new java.awt.Color(51, 0, 255));
         btnUpload.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -79,30 +61,7 @@ public class UploadPanel extends javax.swing.JPanel {
             }
         });
 
-        jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(204, 0, 0));
-        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel2.setText("MOVIES");
-        jPanel1.add(jLabel2);
-
-        cbMovies.setPreferredSize(new java.awt.Dimension(250, 30));
-        jPanel1.add(cbMovies);
-
-        btnSelect.setText("Select");
-        btnSelect.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSelectActionPerformed(evt);
-            }
-        });
-        jPanel1.add(btnSelect);
-
-        btnEdit.setText("Edit");
-        jPanel1.add(btnEdit);
-
-        btnClearSelected.setText("Delete movies");
-        jPanel1.add(btnClearSelected);
-
-        tblSelectedMovies.setModel(new javax.swing.table.DefaultTableModel(
+        tblMovies.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null, null, null},
@@ -113,7 +72,7 @@ public class UploadPanel extends javax.swing.JPanel {
                 "ID", "Title", "Description", "Director", "Actors", "Duration", "Genre", "PubDate", "PicturePath"
             }
         ));
-        jScrollPane2.setViewportView(tblSelectedMovies);
+        jScrollPane2.setViewportView(tblMovies);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -122,9 +81,7 @@ public class UploadPanel extends javax.swing.JPanel {
             .addComponent(btnUpload, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 724, Short.MAX_VALUE)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 724, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -132,77 +89,46 @@ public class UploadPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addGap(21, 21, 21)
                 .addComponent(btnUpload, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 103, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(121, 121, 121)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 483, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnUploadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUploadActionPerformed
-        
-        
-        if ( cbMovies.getModel().getSize() > 0 ) {
-
-            return;
-        }
 
         try {
-            
-            if (repository.selectMovies().size() >0) {
-                loadCheckBoxModel();
+
+            if (repository.selectMovies().size() > 0) {
+                loadTableModel();
                 return;
             }
             
             uploadMovies();
             
-            loadCheckBoxModel();
-            
+
         } catch (Exception e) {
             Logger.getLogger(UploadPanel.class.getName()).log(Level.SEVERE, null, e);
             MessageUtils.showErrorMessage("Unrecoverable error", "Unable to upload movies");
         }
-          
+
 
     }//GEN-LAST:event_btnUploadActionPerformed
 
-    private void btnSelectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectActionPerformed
-        
-        if (cbMovies.getSelectedIndex() == -1) {
-            return;
-        }
-        
-        try {
-            setTableModel();
-            
-        } catch (Exception e) {
-
-        }
-
-    }//GEN-LAST:event_btnSelectActionPerformed
-
     private void uploadMovies() throws Exception, XMLStreamException, IOException {
-        Set<Movie> sortedMovies= new TreeSet<>();
-        List<Movie> movies= new ArrayList<>();
-        
-        movies=MovieParser.parse();
-        movies.forEach(m->sortedMovies.add(m));
+        Set<Movie> sortedMovies = new TreeSet<>();
+        List<Movie> movies = new ArrayList<>();
+
+        movies = MovieParser.parse();
+        movies.forEach(m -> sortedMovies.add(m));
         repository.createMovies(sortedMovies);
     }
-    
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnClearSelected;
-    private javax.swing.JButton btnEdit;
-    private javax.swing.JButton btnSelect;
     private javax.swing.JButton btnUpload;
-    private javax.swing.JComboBox<Movie> cbMovies;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTable tblSelectedMovies;
+    private javax.swing.JTable tblMovies;
     // End of variables declaration//GEN-END:variables
 
     private void init() {
@@ -210,39 +136,26 @@ public class UploadPanel extends javax.swing.JPanel {
             intiRepositry();
             initTable();
         } catch (Exception e) {
-            
+
         }
     }
 
     private void intiRepositry() {
-        repository=RepositoryFactory.getMovieRepository();
+        repository = RepositoryFactory.getMovieRepository();
     }
 
     private void initTable() throws IOException, XMLStreamException {
-        tblSelectedMovies.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        tblSelectedMovies.setAutoCreateRowSorter(true);
-        tblSelectedMovies.setRowHeight(25);
-        
+        tblMovies.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tblMovies.setAutoCreateRowSorter(true);
+        tblMovies.setRowHeight(25);
+
     }
 
-    private void loadCheckBoxModel() throws Exception {
-        List<Movie> movies=repository.selectMovies();
-        defaultComboBoxModel= new DefaultComboBoxModel<>();
-        movies.forEach(m->defaultComboBoxModel.addElement(m));
-        cbMovies.setModel(defaultComboBoxModel);
+    private void loadTableModel() throws Exception {
         
+        List<Movie> movies = repository.selectMovies();
+        moviesTableModel = new MoviesTableModel(movies);
+        tblMovies.setModel(moviesTableModel);
     }
 
-    private void setTableModel() {
-        List<Movie> selectedMovies= new ArrayList<>();
-        Movie movie=(Movie)cbMovies.getSelectedItem();
-        selectedMovies.add(movie);
-        moviesTableModel= new MoviesTableModel(selectedMovies);
-        
-        
-        tblSelectedMovies.setModel(moviesTableModel);
-        
-    }
-
-   
 }

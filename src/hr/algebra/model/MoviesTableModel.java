@@ -26,6 +26,8 @@ public class MoviesTableModel extends AbstractTableModel{
         this.movies = movies;
     }
 
+  
+
     public void setMovies(List<Movie> movies) {
         this.movies = movies;
         fireTableDataChanged();

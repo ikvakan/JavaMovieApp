@@ -38,7 +38,7 @@ import org.jsoup.nodes.Document;
  */
 public class MovieParser {
 
-    private static final String RSS_URL = "https://www.cinestarcinemas.rs/rss.aspx?id=415";
+    private static final String RSS_URL = "https://www.kaptolcinema.hr/rss.aspx?id=2564";
 
     private static final int TIMEOUT = 10000;
     private static final String REQUEST_METHOD = "GET";
