@@ -18,6 +18,7 @@ public class Movie implements Comparable<Movie>{
     public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
     
     
+    
     private int id;
     private String title;
     private String description;

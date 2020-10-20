@@ -17,6 +17,10 @@ public class MoviesTableModel extends AbstractTableModel{
     private static final String[] COULMN_NAMES={"Id","Title","Description","Director","Actors","Duration","Genre","PubDate","PicturePath"};
 
     private List<Movie> movies;
+
+    public void clear() {
+        movies.clear();
+    }
   
 
 

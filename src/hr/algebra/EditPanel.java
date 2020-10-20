@@ -9,19 +9,23 @@ import hr.algebra.model.Movie;
 import hr.algebra.model.MoviesTableModel;
 import hr.algebra.repo.dal.MovieRepository;
 import hr.algebra.repo.dal.RepositoryFactory;
+import hr.algebra.utils.FileUtils;
 import hr.algebra.utils.IconUtils;
 import hr.algebra.utils.MessageUtils;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.text.JTextComponent;
 
@@ -38,10 +42,15 @@ public class EditPanel extends javax.swing.JPanel {
     private List<JTextComponent> validationFields;
     private List<JLabel> errorFields;
     
+    private static final Random RANDOM= new Random();
     private Movie selectedMovie;
+    
+    private EditPanel editPanel;
 
     public EditPanel() {
+        
         initComponents();
+        
 
     }
 
@@ -75,7 +84,6 @@ public class EditPanel extends javax.swing.JPanel {
         jLabel7 = new javax.swing.JLabel();
         tfDate = new javax.swing.JTextField();
         jPanel1 = new javax.swing.JPanel();
-        btnAdd = new javax.swing.JButton();
         btnUpdate = new javax.swing.JButton();
         btnDelete = new javax.swing.JButton();
         lblDirectorError = new javax.swing.JLabel();
@@ -86,6 +94,8 @@ public class EditPanel extends javax.swing.JPanel {
         lblGenreError = new javax.swing.JLabel();
         lblDurationError = new javax.swing.JLabel();
         lblDateError = new javax.swing.JLabel();
+        btnAdd = new javax.swing.JButton();
+        btnRefresh = new javax.swing.JButton();
 
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentShown(java.awt.event.ComponentEvent evt) {
@@ -143,19 +153,13 @@ public class EditPanel extends javax.swing.JPanel {
 
         jLabel6.setText("Duration");
 
-        jLabel7.setText("Date (yyyy-MM-dd)");
+        tfDuration.setName("Number"); // NOI18N
+
+        jLabel7.setText("Date (yyyy-MM-ddThh:mm:ss)");
 
         tfDate.setName("Date"); // NOI18N
 
         jPanel1.setLayout(new java.awt.GridLayout());
-
-        btnAdd.setText("Add");
-        btnAdd.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnAddActionPerformed(evt);
-            }
-        });
-        jPanel1.add(btnAdd);
 
         btnUpdate.setText("Update");
         btnUpdate.addActionListener(new java.awt.event.ActionListener() {
@@ -173,6 +177,23 @@ public class EditPanel extends javax.swing.JPanel {
         });
         jPanel1.add(btnDelete);
 
+        btnAdd.setBackground(new java.awt.Color(0, 0, 255));
+        btnAdd.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnAdd.setForeground(new java.awt.Color(255, 255, 255));
+        btnAdd.setText("Add movie");
+        btnAdd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddActionPerformed(evt);
+            }
+        });
+
+        btnRefresh.setText("Refresh table");
+        btnRefresh.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRefreshActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -180,13 +201,14 @@ public class EditPanel extends javax.swing.JPanel {
             .addComponent(jScrollPane1)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(29, 29, 29)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane2)
-                    .addComponent(tfTitle)
-                    .addComponent(tfDirector)
-                    .addComponent(tfActors)
-                    .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(btnAdd, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(tfTitle, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(tfDirector, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(tfActors, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(tfGenre, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
@@ -203,12 +225,12 @@ public class EditPanel extends javax.swing.JPanel {
                                 .addComponent(jLabel7)
                                 .addGap(9, 9, 9)
                                 .addComponent(lblDateError)
-                                .addGap(0, 177, Short.MAX_VALUE))
+                                .addGap(0, 123, Short.MAX_VALUE))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(tfDuration, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(18, 18, 18)
                                 .addComponent(tfDate))))
-                    .addGroup(layout.createSequentialGroup()
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel3)
                             .addComponent(jLabel2)
@@ -227,11 +249,13 @@ public class EditPanel extends javax.swing.JPanel {
                         .addComponent(lblDescriptionError)
                         .addGap(18, 18, 18)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(tfChooseImage, javax.swing.GroupLayout.PREFERRED_SIZE, 327, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(19, 19, 19)
-                        .addComponent(btnChooseImage))
-                    .addComponent(lbIcon, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                    .addComponent(btnRefresh, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(layout.createSequentialGroup()
+                            .addComponent(tfChooseImage, javax.swing.GroupLayout.PREFERRED_SIZE, 327, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGap(19, 19, 19)
+                            .addComponent(btnChooseImage))
+                        .addComponent(lbIcon, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblImageError)
                 .addGap(50, 50, 50))
@@ -288,22 +312,80 @@ public class EditPanel extends javax.swing.JPanel {
                         .addComponent(tfChooseImage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(btnChooseImage)))
                 .addGap(18, 18, 18)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnRefresh))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 28, Short.MAX_VALUE)
+                .addComponent(btnAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(37, 37, 37)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 224, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
-        // TODO add your handling code here:
+        
+       MovieDialog movieDialog= new MovieDialog(new AdminFrame(),false);
+       movieDialog.setVisible(true);
+       movieDialog.setLocationRelativeTo(this);
+        
     }//GEN-LAST:event_btnAddActionPerformed
 
     private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateActionPerformed
-        // TODO add your handling code here:
+        if (selectedMovie == null) {
+            MessageUtils.showInformationMessage("Wrong operation", "Please choose movie to update");
+            return;
+        }
+        if (formValid()) {
+            try {
+                if (selectedMovie.getPicturePath() == null || 
+                        !tfChooseImage.getText().trim().equals(selectedMovie.getPicturePath())) {
+                    Files.deleteIfExists(Paths.get(selectedMovie.getPicturePath()));
+                    String localPicturePath = uploadPicture();
+                    selectedMovie.setPicturePath(localPicturePath);
+                }
+                
+                selectedMovie.setTitle(tfTitle.getText().trim());
+                selectedMovie.setDirector(tfDirector.getText().trim());
+                selectedMovie.setActors(tfActors.getText().trim());
+                selectedMovie.setDescription(taDecription.getText().trim());
+                selectedMovie.setGenre(tfGenre.getText().trim());
+                selectedMovie.setDuration(tfDuration.getText().trim());
+                selectedMovie.setPubDate(tfDate.getText().trim());
+                
+                
+
+                repository.updateMovie(selectedMovie.getId(), selectedMovie);
+                movieTableModel.setMovies(repository.selectMovies());
+                
+                clearForm();
+            } catch (Exception ex) {
+                Logger.getLogger(EditPanel.class.getName()).log(Level.SEVERE, null, ex);
+                MessageUtils.showErrorMessage("Error", "Unable to update movie!");
+            }
+        }
+
+        
     }//GEN-LAST:event_btnUpdateActionPerformed
 
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
-        // TODO add your handling code here:
+        if (selectedMovie == null) {
+            MessageUtils.showInformationMessage("Wrong operation", "Please choose movie to delete");
+            return;
+        }
+        if (MessageUtils.showConfirmDialog(
+                "Delete movie",
+                "Do you really want to delete selected movie?") == JOptionPane.YES_OPTION) {
+            try {
+                Files.deleteIfExists(Paths.get(selectedMovie.getPicturePath()));
+                repository.deleteMovie(selectedMovie.getId());
+                movieTableModel.setMovies(repository.selectMovies());
+
+                clearForm();
+            } catch (Exception ex) {
+                Logger.getLogger(EditPanel.class.getName()).log(Level.SEVERE, null, ex);
+                MessageUtils.showErrorMessage("Error", "Unable to delete movie!");
+            }
+        }
     }//GEN-LAST:event_btnDeleteActionPerformed
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
@@ -311,7 +393,7 @@ public class EditPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_formComponentShown
 
     private void tblMoviesKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tblMoviesKeyReleased
-        // TODO add your handling code here:
+        showMovie();
     }//GEN-LAST:event_tblMoviesKeyReleased
 
     private void tblMoviesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblMoviesMouseClicked
@@ -319,14 +401,31 @@ public class EditPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_tblMoviesMouseClicked
 
     private void btnChooseImageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChooseImageActionPerformed
-        
+        File file = FileUtils.uploadFile("Images", "jpg", "jpeg", "png");
+        if (file == null) {
+            return;
+        }
+        tfChooseImage.setText(file.getAbsolutePath());
+        setIcon(lbIcon, file);
     }//GEN-LAST:event_btnChooseImageActionPerformed
+
+    private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
+        
+        
+        try {
+             intiTable();
+
+        } catch (Exception ex) {
+            Logger.getLogger(EditPanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_btnRefreshActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;
     private javax.swing.JButton btnChooseImage;
     private javax.swing.JButton btnDelete;
+    private javax.swing.JButton btnRefresh;
     private javax.swing.JButton btnUpdate;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -365,7 +464,7 @@ public class EditPanel extends javax.swing.JPanel {
             intiTable();
         } catch (Exception e) {
             Logger.getLogger(EditPanel.class.getName()).log(Level.SEVERE, null, e);
-            MessageUtils.showErrorMessage("Error", "unable to init form");
+            MessageUtils.showErrorMessage("Error", "Unable to init form");
         }
     }
 
@@ -400,7 +499,7 @@ public class EditPanel extends javax.swing.JPanel {
             }
         } catch (Exception ex) {
             Logger.getLogger(EditPanel.class.getName()).log(Level.SEVERE, null, ex);
-            MessageUtils.showErrorMessage("Error", "Unable to show article!");
+            MessageUtils.showErrorMessage("Error", "Unable to show movie!");
         }
     }
 
@@ -439,5 +538,46 @@ public class EditPanel extends javax.swing.JPanel {
             Logger.getLogger(EditPanel.class.getName()).log(Level.SEVERE, null, ex);
             MessageUtils.showErrorMessage("Error", "Unable to set icon!");
         }
+    }
+
+  private boolean formValid() {
+        boolean result = true;
+
+        for (int i = 0; i < validationFields.size(); i++) {
+            result &= !validationFields.get(i).getText().trim().isEmpty();
+            errorFields.get(i).setText(validationFields.get(i).getText().trim().isEmpty() ? "X" : "");
+            if ("Date".equals(validationFields.get(i).getName())) {
+                try {
+                    LocalDateTime.parse(validationFields.get(i).getText().trim(), Movie.DATE_FORMATTER);
+
+                    errorFields.get(i).setText("");
+                } catch (Exception e) {
+                    result = false;
+                    errorFields.get(i).setText("X");
+                }
+            } else if ("Number".equals(validationFields.get(i).getName())) {
+                try {
+                    
+                    Integer.valueOf(validationFields.get(i).getText().trim());
+                    errorFields.get(i).setText("");
+                } catch (Exception e) {
+                    result = false;
+                    errorFields.get(i).setText("X");
+                }
+            }
+
+        }
+
+        return result;
+        
+  }
+
+    private String uploadPicture() throws IOException {
+        String picturePath = tfChooseImage.getText().trim();
+        String ext = picturePath.substring(picturePath.lastIndexOf("."));
+        String pictureName = Math.abs(RANDOM.nextInt()) + ext;
+        String localPicturePath = DIR + File.separator + pictureName;
+        FileUtils.copy(picturePath, localPicturePath);
+        return localPicturePath;
     }
 }

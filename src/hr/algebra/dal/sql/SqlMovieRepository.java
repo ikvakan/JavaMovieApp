@@ -35,6 +35,8 @@ public class SqlMovieRepository implements MovieRepository {
     private static final String  PICTURE_PATH= "PicturePath";
     
     private static final String CREATE_MOVIE = "{ CALL createMovie (?,?,?,?,?,?,?,?,?) }";
+    private static final String UPDATE_MOVIE = "{ CALL updateMovie (?,?,?,?,?,?,?,?,?) }";
+    private static final String DELETE_MOVIE = "{ CALL deleteMovie (?) }";
     private static final String SELECT_MOVIE = "{ CALL selectMovie (?) }";
     private static final String SELECT_MOVIES = "{ CALL selectMovies }";
     
@@ -86,13 +88,36 @@ public class SqlMovieRepository implements MovieRepository {
     }
 
     @Override
-    public void updateMovie(int id, Movie data) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void updateMovie(int id, Movie movie) throws Exception {
+        DataSource dataSource=DataSourceSingleton.getInstance();
+        try(Connection con=dataSource.getConnection();
+                CallableStatement stmt=con.prepareCall(UPDATE_MOVIE)){
+            
+            stmt.setString(1, movie.getTitle());
+            stmt.setString(2, movie.getDescription());
+            stmt.setString(3, movie.getDirector());
+            stmt.setString(4, movie.getActors());
+            stmt.setString(5, movie.getDuration());
+            stmt.setString(6, movie.getGenre());
+            stmt.setString(7, movie.getPubDate());
+            stmt.setString(8, movie.getPicturePath());
+            stmt.setInt(9, id);
+            
+            stmt.executeUpdate();
+        }
     }
 
     @Override
     public void deleteMovie(int id) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        DataSource dataSource = DataSourceSingleton.getInstance();
+        try (Connection con = dataSource.getConnection();
+                CallableStatement stmt = con.prepareCall(DELETE_MOVIE)) {
+            
+            stmt.setInt(1, id);
+            
+            stmt.executeUpdate();
+        } 
+        
     }
 
     @Override

@@ -19,6 +19,7 @@ public class AdminFrame extends javax.swing.JFrame {
     
     private static final String UPLOAD_PANEL="Upload movies";
     private static final String EDIT_PANEL="Edit movies";
+   
     
     public AdminFrame() {
         initComponents();
@@ -46,13 +47,13 @@ public class AdminFrame extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(tpContent, javax.swing.GroupLayout.DEFAULT_SIZE, 1200, Short.MAX_VALUE)
-                .addContainerGap())
+            .addComponent(tpContent, javax.swing.GroupLayout.DEFAULT_SIZE, 1206, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(tpContent, javax.swing.GroupLayout.DEFAULT_SIZE, 800, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(tpContent, javax.swing.GroupLayout.DEFAULT_SIZE, 815, Short.MAX_VALUE))
         );
 
         pack();
@@ -107,6 +108,7 @@ public class AdminFrame extends javax.swing.JFrame {
         
         tpContent.add(UPLOAD_PANEL,new UploadPanel());
         tpContent.add(EDIT_PANEL,new EditPanel());
+        
     
     }
 

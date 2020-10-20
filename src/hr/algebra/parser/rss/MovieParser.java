@@ -124,7 +124,7 @@ public class MovieParser {
                                 break;
                             case PICTUR_PATH:
                                 if (movie != null && !data.isEmpty()) {
-                                    pictures.add(data);
+                                    //pictures.add(data);
                                     
                                     handlePicture(movie, data);
                                 }
@@ -136,7 +136,7 @@ public class MovieParser {
             }
         }
         
-        createPictureAssets();
+        //createPictureAssets();
         return movies;
 
     }
@@ -151,7 +151,7 @@ public class MovieParser {
         
 
         
-        //FileUtils.copyFromUrl(data, localPicturePath);
+        FileUtils.copyFromUrl(data, localPicturePath);
 
         
 
