@@ -147,7 +147,7 @@ public class LoginFrame extends javax.swing.JFrame {
                     if (isNewUser(user)) {
                         repository.createUser(user);
                         MessageUtils.showInformationMessage("Login", "User added");
-                        //openUserFrame();
+                        openUserFrame();
                         dispose();
                     }
                     else{
@@ -273,5 +273,11 @@ public class LoginFrame extends javax.swing.JFrame {
         }
         
          return result;
+    }
+
+    private void openUserFrame() {
+        UserFrame userFrame= new UserFrame();
+        userFrame.setVisible(true);
+        userFrame.setLocationRelativeTo(this);
     }
 }
