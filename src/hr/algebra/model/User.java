@@ -15,6 +15,9 @@ public class User {
     private  String userName;
     private  String password;
 
+    public User() {
+    }
+
    
 
     public User(int idUser, String userName, String password) {
@@ -39,6 +42,18 @@ public class User {
 
     public String getPassword() {
         return password;
+    }
+
+    public void setIdUser(int idUser) {
+        this.idUser = idUser;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     

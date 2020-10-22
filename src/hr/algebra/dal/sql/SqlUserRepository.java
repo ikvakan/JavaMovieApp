@@ -16,33 +16,40 @@ import java.sql.Types;
 import java.util.ArrayList;
 import javax.sql.DataSource;
 
-
-
 /**
  *
  * @author IgorKvakan
  */
-public class SqlUserRepository implements UserRepository{
+public class SqlUserRepository implements UserRepository {
 
-    private static final String ID_USER="IdUser";
-    private static final String USER_NAME="UserName";
-    private static final String PASSWORD="Password";
-    
-    private static final String CREATE_USER="{ CALL createUser (?,?,?) }";
-    private static final String SELECT_USER="{ CALL selectUser (?) }";
-    private static final String SELECT_USERS="{ CALL selectUsers  }";
     
     
+    private static final String ID_USER = "IdUser";
+    private static final String USER_NAME = "UserName";
+    private static final String PASSWORD = "Password";
+
+    private static final String CREATE_USER = "{ CALL createUser (?,?,?) }";
+    private static final String SELECT_USER = "{ CALL selectUser (?) }";
+    private static final String SELECT_USERS = "{ CALL selectUsers  }";
+
+    private static final String INSERT_INTO_USER_MOVIES = "{ CALL insertIntoUserMovies (?,?)  }";
     
+
+    public SqlUserRepository() {
+        
+    }
+    
+    
+
     @Override
     public int createUser(User user) throws Exception {
-        DataSource dataSourcece=DataSourceSingleton.getInstance();
-        try(Connection con= dataSourcece.getConnection();
-                CallableStatement stmt= con.prepareCall(CREATE_USER)){
-            stmt.setString(1,user.getUserName());
-            stmt.setString(2,user.getPassword());
+        DataSource dataSourcece = DataSourceSingleton.getInstance();
+        try (Connection con = dataSourcece.getConnection();
+                CallableStatement stmt = con.prepareCall(CREATE_USER)) {
+            stmt.setString(1, user.getUserName());
+            stmt.setString(2, user.getPassword());
             stmt.registerOutParameter(3, Types.INTEGER);
-            
+
             stmt.executeUpdate();
             return stmt.getInt(3);
         }
@@ -50,13 +57,13 @@ public class SqlUserRepository implements UserRepository{
 
     @Override
     public Optional<User> selectUser(int id) throws Exception {
-        DataSource dataSource=DataSourceSingleton.getInstance();
+        DataSource dataSource = DataSourceSingleton.getInstance();
         try (Connection con = dataSource.getConnection();
-                CallableStatement stmt=con.prepareCall(SELECT_USER)){
-            
+                CallableStatement stmt = con.prepareCall(SELECT_USER)) {
+
             stmt.setInt(1, id);
-            try(ResultSet rs=stmt.executeQuery()){
-                
+            try (ResultSet rs = stmt.executeQuery()) {
+
                 if (rs.next()) {
                     return Optional.of(new User(
                             rs.getInt(ID_USER),
@@ -65,7 +72,7 @@ public class SqlUserRepository implements UserRepository{
                 }
             }
         }
-        
+
         return Optional.empty();
     }
 
@@ -76,18 +83,31 @@ public class SqlUserRepository implements UserRepository{
         try (Connection con = dataSource.getConnection();
                 CallableStatement stmt = con.prepareCall(SELECT_USERS);
                 ResultSet rs = stmt.executeQuery()) {
-          
+
             while (rs.next()) {
                 users.add(new User(
-                                rs.getInt(ID_USER),
-                                rs.getString(USER_NAME),
-                                rs.getString(PASSWORD))
+                        rs.getInt(ID_USER),
+                        rs.getString(USER_NAME),
+                        rs.getString(PASSWORD))
                 );
-            
+
             };
-        
-        } 
+
+        }
         return users;
     }
-    
+
+    @Override
+    public void insertIntoUserMovies(int idUser, int idMovie) throws Exception {
+        DataSource dataSource = DataSourceSingleton.getInstance();
+        try (Connection con = dataSource.getConnection();
+                CallableStatement stmt = con.prepareCall(INSERT_INTO_USER_MOVIES)) {
+
+            stmt.setInt(1,idUser);
+            stmt.setInt(2,idMovie);
+            
+            stmt.executeUpdate();
+        }
+    }
+
 }

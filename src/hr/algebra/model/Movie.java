@@ -8,25 +8,46 @@ package hr.algebra.model;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlType;
 
 /**
  *
  * @author IgorKvakan
  */
-public class Movie implements Comparable<Movie>{
-    
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(propOrder = {"id","title", "description", "directors", "actors", "duration", "genre", "pubDate","picturePath"})
+public class Movie implements Comparable<Movie> {
+
     public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
     
+    //@XmlElementWrapper
     
-    
+    @XmlElement(name="id")
     private int id;
+
+    @XmlElement(name = "title")
     private String title;
+    @XmlElement(name = "description")
     private String description;
+    @XmlElement(name = "directors")
     private String directors;
+    @XmlElement(name = "actors")
+
     private String actors;
+    @XmlElement(name = "duration")
+
     private String duration;
-    private String genre;    
+    @XmlElement(name = "genre")
+
+    private String genre;
+    @XmlElement(name = "pubDate")
+
     private String pubDate;
+    @XmlElement(name="picturePath")
     private String picturePath;
 
     public Movie(int id, String title, String description, String directors, String actors, String duration, String genre, String pubDate, String picturePath) {
@@ -55,8 +76,6 @@ public class Movie implements Comparable<Movie>{
     public Movie() {
     }
 
-    
-    
     public int getId() {
         return id;
     }
@@ -81,7 +100,7 @@ public class Movie implements Comparable<Movie>{
         this.description = description;
     }
 
-    public String  getDirector() {
+    public String getDirector() {
         return directors;
     }
 
@@ -131,14 +150,12 @@ public class Movie implements Comparable<Movie>{
 
     @Override
     public String toString() {
-        return id +" - " + title ;
+        return id + " - " + title + " - " + genre;
     }
 
     @Override
     public int compareTo(Movie m) {
-       return title.compareTo(m.title);
+        return title.compareTo(m.title);
     }
-    
-    
-    
+
 }

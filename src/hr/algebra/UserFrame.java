@@ -6,14 +6,22 @@
 package hr.algebra;
 
 import hr.algebra.model.Movie;
+import hr.algebra.model.MovieArchive;
+import hr.algebra.model.User;
 import hr.algebra.repo.dal.MovieRepository;
 import hr.algebra.repo.dal.RepositoryFactory;
+import hr.algebra.repo.dal.UserRepository;
+import hr.algebra.utils.JAXBUtils;
 import hr.algebra.utils.MessageUtils;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
+import java.sql.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
@@ -25,7 +33,7 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.TransferHandler;
-
+import javax.xml.bind.JAXBException;
 
 /**
  *
@@ -33,17 +41,21 @@ import javax.swing.TransferHandler;
  */
 public class UserFrame extends javax.swing.JFrame {
 
-   
-    private Set<Movie> movies= new TreeSet<>();
-    private Set<Movie> favouriteMovies= new TreeSet<>();
-    
+    private static final String FILENAME = "moviearchive.xml";
+
+    private List<Movie> movies = new ArrayList<>() ;
+    private Set<Movie> favouriteMovies = new TreeSet<>();
+
     private DefaultListModel<Movie> moviesListModel;
     private DefaultListModel<Movie> favouriteMoviesListModel;
-    
+
     private MovieRepository movieRepository;
-    
-    public UserFrame() {
+    private UserRepository userRepository;
+    private User userLogin;
+
+    public UserFrame(User user) {
         initComponents();
+        this.userLogin = (User) user;
         init();
     }
 
@@ -63,14 +75,23 @@ public class UserFrame extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         lsFavouriteMovies = new javax.swing.JList<>();
         jLabel2 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        btnSave = new javax.swing.JButton();
+        btnClear = new javax.swing.JButton();
+        lbUser = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        btnDelete = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
+        miImport = new javax.swing.JMenuItem();
+        miExport = new javax.swing.JMenuItem();
         miExit = new javax.swing.JMenuItem();
-        jMenuItem2 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentShown(java.awt.event.ComponentEvent evt) {
+                formComponentShown(evt);
+            }
+        });
 
         btnShowMovies.setText("Show movies");
         btnShowMovies.addActionListener(new java.awt.event.ActionListener() {
@@ -91,22 +112,64 @@ public class UserFrame extends javax.swing.JFrame {
         jLabel2.setText("Movies");
         jLabel2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
-        jButton1.setText("Info");
+        btnSave.setText("Save favourites");
+        btnSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSaveActionPerformed(evt);
+            }
+        });
 
-        jButton2.setText("Delete");
+        btnClear.setText("Clear favourites");
+        btnClear.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnClearActionPerformed(evt);
+            }
+        });
+
+        lbUser.setBackground(javax.swing.UIManager.getDefaults().getColor("Actions.Red"));
+        lbUser.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lbUser.setForeground(new java.awt.Color(255, 255, 255));
+        lbUser.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lbUser.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
+        jLabel3.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(51, 0, 255));
+        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel3.setText("DOBRODOŠLI");
+
+        btnDelete.setText("Delete");
+        btnDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeleteActionPerformed(evt);
+            }
+        });
 
         jMenu1.setText("File");
 
-        miExit.setText("Save");
-        jMenu1.add(miExit);
-
-        jMenuItem2.setText("Exit");
-        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+        miImport.setText("Import");
+        miImport.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem2ActionPerformed(evt);
+                miImportActionPerformed(evt);
             }
         });
-        jMenu1.add(jMenuItem2);
+        jMenu1.add(miImport);
+
+        miExport.setText("Export");
+        miExport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miExportActionPerformed(evt);
+            }
+        });
+        jMenu1.add(miExport);
+
+        miExit.setText("Exit");
+        miExit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miExitActionPerformed(evt);
+            }
+        });
+        jMenu1.add(miExit);
 
         jMenuBar1.add(jMenu1);
 
@@ -120,64 +183,181 @@ public class UserFrame extends javax.swing.JFrame {
                 .addComponent(btnShowMovies, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lbUser, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(21, 21, 21))
+            .addGroup(layout.createSequentialGroup()
                 .addGap(55, 55, 55)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGap(362, 362, 362)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(97, 97, 97))
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(362, 362, 362)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 322, Short.MAX_VALUE)
+                            .addComponent(btnDelete, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(263, 263, 263)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btnClear, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnSave, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jButton1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jButton2))
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE))))
-                .addGap(183, 183, 183))
+                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 326, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE)))))
+                .addGap(86, 86, 86))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(54, 54, 54)
+                .addGap(12, 12, 12)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(lbUser, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnShowMovies, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE))
+                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 291, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 291, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
-                    .addComponent(jButton2))
-                .addGap(50, 50, 50))
+                .addGap(4, 4, 4)
+                .addComponent(btnClear)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnSave))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(6, 6, 6)
+                        .addComponent(btnDelete)))
+                .addGap(34, 34, 34))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+    private void miExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miExitActionPerformed
         if (MessageUtils.showConfirmDialog("Exit", "Do you want to exit ?") == JOptionPane.YES_NO_OPTION) {
             System.exit(0);
 
         }
-    }//GEN-LAST:event_jMenuItem2ActionPerformed
+    }//GEN-LAST:event_miExitActionPerformed
 
     private void btnShowMoviesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnShowMoviesActionPerformed
-        
+
         try {
-            
+
             setMovieList();
-            
+
         } catch (Exception ex) {
             Logger.getLogger(UserFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
     }//GEN-LAST:event_btnShowMoviesActionPerformed
+
+    private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed
+
+        if (favouriteMoviesListModel.isEmpty()) {
+            return;
+        }
+
+        try {
+            favouriteMovies.clear();
+            favouriteMoviesListModel.clear();
+            movieRepository.deleteMovieForUser(userLogin.getIdUser());
+        } catch (Exception ex) {
+            Logger.getLogger(UserFrame.class.getName()).log(Level.SEVERE, null, ex);
+            MessageUtils.showErrorMessage("Error", "Unable to delete.");
+        }
+    }//GEN-LAST:event_btnClearActionPerformed
+
+    private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
+
+        if (favouriteMoviesListModel.size() == 0) {
+            MessageUtils.showErrorMessage("errr", "nema nikoga");
+            return;
+        }
+
+        try {
+            List<Movie> movies = new ArrayList<>(favouriteMovies);
+            List<User> users = userRepository.selectUsers();
+
+            for (User user : users) {
+                if ((user.getUserName().equals(userLogin.getUserName()) && user.getPassword().equals(userLogin.getPassword()))) {
+                    userLogin.setIdUser(user.getIdUser());
+                    //System.out.println(userLogin.getIdUser());
+                }
+            }
+
+            for (Movie movie : movies) {
+                //System.out.println(movie.getTitle());
+                userRepository.insertIntoUserMovies(userLogin.getIdUser(), movie.getId());
+            }
+
+            MessageUtils.showInformationMessage("Save", "Movies saved");
+        } catch (Exception ex) {
+            Logger.getLogger(UserFrame.class.getName()).log(Level.SEVERE, null, ex);
+            MessageUtils.showErrorMessage("Error", "Unable to save list");
+        }
+
+
+    }//GEN-LAST:event_btnSaveActionPerformed
+
+    private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
+        initUser();
+
+        try {
+            loadFavouriteMovies();
+        } catch (Exception ex) {
+            Logger.getLogger(UserFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }//GEN-LAST:event_formComponentShown
+
+    private void miImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miImportActionPerformed
+        
+        try {
+            MovieArchive movieArchive=(MovieArchive)JAXBUtils.load(MovieArchive.class, FILENAME);
+            movies.clear();
+            moviesListModel.clear();
+            movies.addAll(movieArchive.getMovies());
+            movies.forEach(m->moviesListModel.addElement(m));
+            lsMovies.setModel(moviesListModel);
+        } catch (JAXBException ex) {
+            Logger.getLogger(UserFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_miImportActionPerformed
+
+    private void miExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miExportActionPerformed
+
+        try {
+            
+            
+            
+            
+            JAXBUtils.save(new MovieArchive(movies), FILENAME);
+
+        } catch (Exception ex) {
+            Logger.getLogger(UserFrame.class.getName()).log(Level.SEVERE, null, ex);
+            MessageUtils.showErrorMessage("Error", "Cannot export file");
+        }
+
+
+    }//GEN-LAST:event_miExportActionPerformed
+
+    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
+        if (lsMovies.getSelectedIndex() == -1) {
+            return;
+        }
+        
+        moviesListModel.removeElementAt(lsMovies.getSelectedIndex());
+        
+    }//GEN-LAST:event_btnDeleteActionPerformed
 
     /**
      * @param args the command line arguments
@@ -209,7 +389,7 @@ public class UserFrame extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                UserFrame userFrame = new UserFrame();
+                UserFrame userFrame = new UserFrame(null);
                 userFrame.setVisible(true);
                 userFrame.setLocationRelativeTo(null);
             }
@@ -217,19 +397,23 @@ public class UserFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnClear;
+    private javax.swing.JButton btnDelete;
+    private javax.swing.JButton btnSave;
     private javax.swing.JButton btnShowMovies;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JLabel lbUser;
     private javax.swing.JList<Movie> lsFavouriteMovies;
     private javax.swing.JList<Movie> lsMovies;
     private javax.swing.JMenuItem miExit;
+    private javax.swing.JMenuItem miExport;
+    private javax.swing.JMenuItem miImport;
     // End of variables declaration//GEN-END:variables
 
     private void init() {
@@ -237,39 +421,61 @@ public class UserFrame extends javax.swing.JFrame {
             intiRepository();
             intiListModel();
             initDragNDrop();
+//            initUser();
+//            loadFavouriteMovies();
         } catch (Exception e) {
+            Logger.getLogger(UserFrame.class.getName()).log(Level.SEVERE, null, e);
+            MessageUtils.showErrorMessage("error", "Cannot initialize form");
         }
     }
 
-    private void intiRepository() {
-        movieRepository=RepositoryFactory.getMovieRepository();
+    private void initUser() {
+        if (userLogin.getUserName() == "") {
+            lbUser.setText("");
+        } else {
+            lbUser.setText(userLogin.getUserName());
+        }
+    }
+
+    private void intiRepository() throws Exception {
+        movieRepository = RepositoryFactory.getMovieRepository();
+        userRepository = RepositoryFactory.getSqlUserRepository();
     }
 
     private void setMovieList() throws Exception {
         moviesListModel.clear();
-        List<Movie> movies=movieRepository.selectMovies();
-        movies.forEach(m->moviesListModel.addElement(m));
+        movies = movieRepository.selectMovies();
+        movies.forEach(m -> moviesListModel.addElement(m));
         lsMovies.setModel(moviesListModel);
-        
+
     }
 
     private void intiListModel() {
-        moviesListModel=new DefaultListModel<>();
-        favouriteMoviesListModel=new DefaultListModel<>();
-                
+        moviesListModel = new DefaultListModel<>();
+        favouriteMoviesListModel = new DefaultListModel<>();
+
     }
 
     private void initDragNDrop() {
         lsMovies.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         lsMovies.setDragEnabled(true);
         lsMovies.setTransferHandler(new ExportTranferHandler());
-        
+
         lsFavouriteMovies.setDropMode(DropMode.ON);
         lsFavouriteMovies.setTransferHandler(new ImportTransferHandler());
-                
+
     }
 
-    private  class ExportTranferHandler extends TransferHandler {
+    private void loadFavouriteMovies() throws Exception {
+        System.out.println(userLogin.getIdUser());
+        List<Movie> movies = movieRepository.selectMovieForUser(userLogin.getIdUser());
+        Set<Movie> set = new TreeSet<>(movies);
+        set.forEach(m -> favouriteMoviesListModel.addElement(m));
+        lsFavouriteMovies.setModel(favouriteMoviesListModel);
+
+    }
+
+    private class ExportTranferHandler extends TransferHandler {
 
         @Override
         protected Transferable createTransferable(JComponent c) {
@@ -281,10 +487,9 @@ public class UserFrame extends javax.swing.JFrame {
             return COPY;
         }
 
-        
     }
 
-    private  class ImportTransferHandler extends TransferHandler {
+    private class ImportTransferHandler extends TransferHandler {
 
         public ImportTransferHandler() {
         }
@@ -296,30 +501,27 @@ public class UserFrame extends javax.swing.JFrame {
 
         @Override
         public boolean importData(TransferSupport support) {
-            Transferable transferable=support.getTransferable();
-            
+            Transferable transferable = support.getTransferable();
+
             try {
-                Movie movie=(Movie)transferable.getTransferData(MovieTransferable.MOVIE_FLAVOR);
+                Movie movie = (Movie) transferable.getTransferData(MovieTransferable.MOVIE_FLAVOR);
                 if (favouriteMovies.add(movie)) {
                     loadFavouriteMoviesModel();
                     return true;
                 }
-                
-                
-            } catch (UnsupportedFlavorException |IOException  ex) {
+
+            } catch (UnsupportedFlavorException | IOException ex) {
                 Logger.getLogger(UserFrame.class.getName()).log(Level.SEVERE, null, ex);
-            } 
-            
+            }
+
             return false;
         }
 
         private void loadFavouriteMoviesModel() {
             favouriteMoviesListModel.clear();
-            favouriteMovies.forEach(e->favouriteMoviesListModel.addElement(e));
+            favouriteMovies.forEach(e -> favouriteMoviesListModel.addElement(e));
             lsFavouriteMovies.setModel(favouriteMoviesListModel);
         }
-        
-        
-        
+
     }
 }

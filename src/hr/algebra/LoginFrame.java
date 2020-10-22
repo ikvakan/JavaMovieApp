@@ -5,14 +5,13 @@
  */
 package hr.algebra;
 
-
-
 import hr.algebra.model.User;
 import hr.algebra.repo.dal.RepositoryFactory;
 import hr.algebra.repo.dal.UserRepository;
 import hr.algebra.utils.MessageUtils;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JLabel;
@@ -27,14 +26,15 @@ public class LoginFrame extends javax.swing.JFrame {
     /**
      * Creates new form LoginFrame
      */
-    
     private AdminFrame adminFrame;
-    
-    List<JTextField> validationFields;
-    List<JLabel> errorFields;
-    
+
+    List<JTextField> validationLoginFields;
+    List<JLabel> errorLoginFields;
+    List<JTextField> validationRegisterFields;
+    List<JLabel> errorRegisterFields;
+
     private UserRepository repository;
-    
+
     public LoginFrame() {
         initComponents();
         init();
@@ -49,6 +49,8 @@ public class LoginFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jTabbedPane1 = new javax.swing.JTabbedPane();
+        jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         tfUserName = new javax.swing.JTextField();
@@ -57,6 +59,15 @@ public class LoginFrame extends javax.swing.JFrame {
         tfPassword = new javax.swing.JPasswordField();
         lbUserError = new javax.swing.JLabel();
         lbPasswordError = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        tfNewUserName = new javax.swing.JTextField();
+        btnRegister = new javax.swing.JButton();
+        btnExitRegister = new javax.swing.JButton();
+        tfNewPassword = new javax.swing.JPasswordField();
+        lbNewUserError = new javax.swing.JLabel();
+        lbNewPasswordError = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -78,48 +89,128 @@ public class LoginFrame extends javax.swing.JFrame {
             }
         });
 
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel2)
+                    .addComponent(jLabel1))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(tfPassword)
+                    .addComponent(tfUserName, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(btnLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnExit, javax.swing.GroupLayout.DEFAULT_SIZE, 285, Short.MAX_VALUE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lbPasswordError, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lbUserError, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(68, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lbUserError, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel1)
+                        .addComponent(tfUserName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(tfPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lbPasswordError, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnLogin)
+                    .addComponent(btnExit))
+                .addGap(97, 97, 97))
+        );
+
+        jTabbedPane1.addTab("Login", jPanel1);
+
+        jLabel3.setText("New user name");
+
+        jLabel4.setText("Password");
+
+        btnRegister.setText("Register");
+        btnRegister.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRegisterActionPerformed(evt);
+            }
+        });
+
+        btnExitRegister.setText("Exit");
+        btnExitRegister.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExitRegisterActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel4)
+                    .addComponent(jLabel3))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(tfNewPassword)
+                    .addComponent(tfNewUserName, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(btnRegister, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnExitRegister, javax.swing.GroupLayout.DEFAULT_SIZE, 259, Short.MAX_VALUE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lbNewPasswordError, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lbNewUserError, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap(68, Short.MAX_VALUE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lbNewUserError, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel3)
+                        .addComponent(tfNewUserName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(tfNewPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lbNewPasswordError, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnRegister)
+                    .addComponent(btnExitRegister))
+                .addGap(97, 97, 97))
+        );
+
+        jTabbedPane1.addTab("Register", jPanel2);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(100, 100, 100)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel2)
-                    .addComponent(jLabel1))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(tfPassword)
-                    .addComponent(tfUserName, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnExit, javax.swing.GroupLayout.DEFAULT_SIZE, 121, Short.MAX_VALUE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lbPasswordError, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lbUserError, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(28, 28, 28))
+                .addContainerGap()
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 565, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(69, 69, 69)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lbUserError, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel1)
-                        .addComponent(tfUserName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(tfPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lbPasswordError, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnLogin)
-                    .addComponent(btnExit))
-                .addContainerGap(129, Short.MAX_VALUE))
+            .addComponent(jTabbedPane1, javax.swing.GroupLayout.Alignment.TRAILING)
         );
 
         pack();
@@ -130,48 +221,75 @@ public class LoginFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_btnExitActionPerformed
 
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
-        
-        if (formValid()) {
-            
-                User user = new User(
-                        tfUserName.getText().trim(),
-                        new String(tfPassword.getPassword()));
-                
-                if (user.isAdmin(user.getUserName(), user.getPassword())) {
-                    MessageUtils.showInformationMessage("Login", "Loged in as admin");
-                    openAdminFrame();
-                    dispose();
-                }                
-                
-              else try {
-                    if (isNewUser(user)) {
-                        repository.createUser(user);
-                        MessageUtils.showInformationMessage("Login", "User added");
-                        openUserFrame();
-                        dispose();
-                    }
-                    else{
-                        MessageUtils.showInformationMessage("Login", "Enter new user name and password");
-                        clearForm();
-                    }
-                  
-                
-                   
-            } catch (Exception e) {
-                Logger.getLogger(LoginFrame.class.getName()).log(Level.SEVERE, null, e);
-                MessageUtils.showErrorMessage("Login error", "Cannot create login");
+
+        if (loginFormValid()) {
+
+            User user = new User(
+                    tfUserName.getText().trim(),
+                    new String(tfPassword.getPassword()));
+
+            if (user.isAdmin(user.getUserName(), user.getPassword())) {
+                MessageUtils.showInformationMessage("Login", "Loged in as admin");
+                openAdminFrame();
+                //dispose();
+            } else if (!isNewUser(user)) {
+
+                try {
+                    User loginUser = getLoginUser(user);
+                    MessageUtils.showInformationMessage("Login", "User loged in");
+                    //System.out.println(loginUser.getIdUser());
+
+                    openUserFrame(loginUser);
+                    
+                } catch (Exception ex) {
+                    Logger.getLogger(LoginFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    MessageUtils.showInformationMessage("Error", "Login error");
+                }
+
             }
-                
+
         }
-        
+
     }//GEN-LAST:event_btnLoginActionPerformed
+
+    private void btnRegisterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegisterActionPerformed
+        if (registerFormValid()) {
+
+            User user = new User(
+                    tfNewUserName.getText().trim(),
+                    new String(tfNewPassword.getPassword()));
+
+            if (isNewUser(user)) {
+
+                try {
+                    repository.createUser(user);
+                    MessageUtils.showInformationMessage("Register", "User registered");
+                    clearRegisterForm();
+
+                } catch (Exception ex) {
+                    Logger.getLogger(LoginFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    MessageUtils.showInformationMessage("Register", "User registration error");
+
+                }
+
+            } else {
+                MessageUtils.showInformationMessage("Register", "Enter new user name and password");
+                clearRegisterForm();
+            }
+        }
+
+
+    }//GEN-LAST:event_btnRegisterActionPerformed
+
+    private void btnExitRegisterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExitRegisterActionPerformed
+        System.exit(0);
+    }//GEN-LAST:event_btnExitRegisterActionPerformed
 
     private void openAdminFrame() {
         adminFrame = new AdminFrame();
         adminFrame.setVisible(true);
         adminFrame.setLocationRelativeTo(this);
     }
-    
 
     /**
      * @param args the command line arguments
@@ -203,7 +321,7 @@ public class LoginFrame extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                LoginFrame loginFrame=new LoginFrame();
+                LoginFrame loginFrame = new LoginFrame();
                 loginFrame.setVisible(true);
                 loginFrame.setLocationRelativeTo(null);
             }
@@ -212,18 +330,30 @@ public class LoginFrame extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnExit;
+    private javax.swing.JButton btnExitRegister;
     private javax.swing.JButton btnLogin;
+    private javax.swing.JButton btnRegister;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JLabel lbNewPasswordError;
+    private javax.swing.JLabel lbNewUserError;
     private javax.swing.JLabel lbPasswordError;
     private javax.swing.JLabel lbUserError;
+    private javax.swing.JPasswordField tfNewPassword;
+    private javax.swing.JTextField tfNewUserName;
     private javax.swing.JPasswordField tfPassword;
     private javax.swing.JTextField tfUserName;
     // End of variables declaration//GEN-END:variables
 
     private void init() {
         try {
-            intiFields();
+            intiLoginFields();
+            intiRegisterFields();
             initRepository();
         } catch (Exception e) {
             Logger.getLogger(LoginFrame.class.getName()).log(Level.SEVERE, null, e);
@@ -232,52 +362,85 @@ public class LoginFrame extends javax.swing.JFrame {
     }
 
     private void initRepository() throws Exception {
-       repository=RepositoryFactory.getSqlUserRepository();
+        repository = RepositoryFactory.getSqlUserRepository();
     }
 
-    private void intiFields() {
-       validationFields=Arrays.asList(tfUserName,tfPassword);
-       errorFields=Arrays.asList(lbUserError,lbPasswordError);
-              
+    private void intiLoginFields() {
+        validationLoginFields = Arrays.asList(tfUserName, tfPassword);
+        errorLoginFields = Arrays.asList(lbUserError, lbPasswordError);
+
     }
 
-    private boolean formValid() {
-        boolean ok=true;
-        for (int i = 0; i < validationFields.size(); i++) {
-            ok &= !validationFields.get(i).getText().trim().isEmpty();
-            errorFields.get(i).setText(validationFields.get(i).getText().isEmpty() ? "X":"");
+    private boolean loginFormValid() {
+        boolean ok = true;
+        for (int i = 0; i < validationLoginFields.size(); i++) {
+            ok &= !validationLoginFields.get(i).getText().trim().isEmpty();
+            errorLoginFields.get(i).setText(validationLoginFields.get(i).getText().isEmpty() ? "X" : "");
         }
-        
+
         return ok;
     }
 
-    private void clearForm() {
-        validationFields.forEach(e->e.setText(""));
-        errorFields.forEach(e->e.setText(""));
+    private void clearLoginForm() {
+        validationLoginFields.forEach(e -> e.setText(""));
+        errorLoginFields.forEach(e -> e.setText(""));
+    }
+
+    private void clearRegisterForm() {
+        validationRegisterFields.forEach(e -> e.setText(""));
+        errorRegisterFields.forEach(e -> e.setText(""));
     }
 
     private boolean isNewUser(User user) {
-        boolean result=true;
-        
+        boolean result = true;
+
         try {
-            List<User> users=repository.selectUsers();
-            
+            List<User> users = repository.selectUsers();
+
             for (User u : users) {
                 if (u.getUserName().equals(user.getUserName()) && (u.getPassword().equals(user.getPassword()))) {
-                    result=false;
+                    result = false;
                 }
             }
-          
+
         } catch (Exception ex) {
             Logger.getLogger(LoginFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-         return result;
+
+        return result;
     }
 
-    private void openUserFrame() {
-        UserFrame userFrame= new UserFrame();
+    private void openUserFrame(User user) {
+        UserFrame userFrame = new UserFrame(user);
         userFrame.setVisible(true);
         userFrame.setLocationRelativeTo(this);
+    }
+
+    private void intiRegisterFields() {
+        validationRegisterFields = Arrays.asList(tfNewUserName, tfNewPassword);
+        errorRegisterFields = Arrays.asList(lbNewUserError, lbNewPasswordError);
+    }
+
+    private boolean registerFormValid() {
+        boolean ok = true;
+        for (int i = 0; i < validationRegisterFields.size(); i++) {
+            ok &= !validationRegisterFields.get(i).getText().trim().isEmpty();
+            errorRegisterFields.get(i).setText(validationRegisterFields.get(i).getText().isEmpty() ? "X" : "");
+        }
+
+        return ok;
+    }
+
+    private User getLoginUser(User user) throws Exception {
+        List<User> users = repository.selectUsers();
+        User loginUser = new User();
+        for (User us : users) {
+            if ((us.getUserName().equals(user.getUserName()) && us.getPassword().equals(user.getPassword()))) {
+                loginUser = us;
+                //System.out.println(userLogin.getIdUser());
+            }
+        }
+
+        return loginUser;
     }
 }

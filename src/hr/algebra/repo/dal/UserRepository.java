@@ -18,4 +18,6 @@ public interface UserRepository {
     int createUser(User user) throws Exception;
     Optional<User> selectUser(int id) throws Exception;
     List<User> selectUsers() throws Exception;
+    void insertIntoUserMovies(int idUser,int idMovie) throws Exception;
+    
 }
