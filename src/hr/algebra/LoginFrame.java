@@ -247,6 +247,10 @@ public class LoginFrame extends javax.swing.JFrame {
                 }
 
             }
+            else{
+                MessageUtils.showInformationMessage("Error", "User is not registered!");
+                clearLoginForm();
+            }
 
         }
 

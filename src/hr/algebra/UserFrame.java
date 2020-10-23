@@ -337,9 +337,6 @@ public class UserFrame extends javax.swing.JFrame {
 
         try {
             
-            
-            
-            
             JAXBUtils.save(new MovieArchive(movies), FILENAME);
 
         } catch (Exception ex) {
@@ -356,6 +353,8 @@ public class UserFrame extends javax.swing.JFrame {
         }
         
         moviesListModel.removeElementAt(lsMovies.getSelectedIndex());
+        
+        
         
     }//GEN-LAST:event_btnDeleteActionPerformed
 
