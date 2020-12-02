@@ -11,7 +11,6 @@ import hr.algebra.repo.dal.UserRepository;
 import hr.algebra.utils.MessageUtils;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JLabel;
@@ -231,13 +230,13 @@ public class LoginFrame extends javax.swing.JFrame {
             if (user.isAdmin(user.getUserName(), user.getPassword())) {
                 MessageUtils.showInformationMessage("Login", "Loged in as admin");
                 openAdminFrame();
-                //dispose();
+                
             } else if (!isNewUser(user)) {
 
                 try {
                     User loginUser = getLoginUser(user);
                     MessageUtils.showInformationMessage("Login", "User loged in");
-                    //System.out.println(loginUser.getIdUser());
+                   
 
                     openUserFrame(loginUser);
                     
@@ -441,7 +440,7 @@ public class LoginFrame extends javax.swing.JFrame {
         for (User us : users) {
             if ((us.getUserName().equals(user.getUserName()) && us.getPassword().equals(user.getPassword()))) {
                 loginUser = us;
-                //System.out.println(userLogin.getIdUser());
+                
             }
         }
 

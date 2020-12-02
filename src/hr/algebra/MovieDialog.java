@@ -7,13 +7,11 @@ package hr.algebra;
 
 
 import hr.algebra.model.Movie;
-import hr.algebra.model.MoviesTableModel;
 import hr.algebra.repo.dal.MovieRepository;
 import hr.algebra.repo.dal.RepositoryFactory;
 import hr.algebra.utils.FileUtils;
 import hr.algebra.utils.IconUtils;
 import hr.algebra.utils.MessageUtils;
-import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -23,11 +21,9 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
-import javax.swing.JComponent;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTable;
 import javax.swing.text.JTextComponent;
 
 /**

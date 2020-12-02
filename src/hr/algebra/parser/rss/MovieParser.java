@@ -12,7 +12,6 @@ import hr.algebra.utils.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +19,6 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamConstants;
@@ -38,7 +36,8 @@ import org.jsoup.nodes.Document;
  */
 public class MovieParser {
 
-    private static final String RSS_URL = "https://www.kaptolcinema.hr/rss.aspx?id=2564";
+    //private static final String RSS_URL = "https://www.kaptolcinema.hr/rss.aspx?id=2564";
+    private static final String RSS_URL = "https://www.blitz-cinestar.hr/rss.aspx?najava=1";
 
     private static final int TIMEOUT = 10000;
     private static final String REQUEST_METHOD = "GET";
@@ -70,10 +69,10 @@ public class MovieParser {
                     String qName = startElement.getName().getLocalPart();
                     tagType = TagType.from(qName);
 
-                    if (qName == ITEM_ELEMENT) {
-                        movie = new Movie();
-                        movies.add(movie);
-                    }
+//                    if (qName == ITEM_ELEMENT) {
+//                        movie = new Movie();
+//                        movies.add(movie);
+//                    }
 
                     break;
                 case XMLStreamConstants.CHARACTERS:
@@ -85,6 +84,11 @@ public class MovieParser {
 
                         switch (tagType.get()) {
 
+                            case ITEM:
+                                movie = new Movie();
+                                movies.add(movie);
+                                break;
+                            
                             case TITLE:
                                 if (movie != null && !data.isEmpty()) {
                                     movie.setTitle(data);
@@ -104,6 +108,7 @@ public class MovieParser {
                             case ACTORS:
                                 if (movie != null && !data.isEmpty()) {
                                     movie.setActors(data);
+                                    System.out.println(data);
                                 }
                                 break;
                             case DURATION:
@@ -185,7 +190,8 @@ public class MovieParser {
 
         ITEM("item"),
         TITLE("title"),
-        PUB_DATE("datumprikazivanja"),
+        //PUB_DATE("datumprikazivanja"),
+        PUB_DATE("pocetak"),
         DESCRIPTION("description"),
         DIRECTOR("redatelj"),
         ACTORS("glumci"),
